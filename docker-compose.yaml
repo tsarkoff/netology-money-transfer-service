@@ -1,0 +1,33 @@
+######## COMMAND LINE DEPLOY & START ########
+# docker images
+#   REPOSITORY              TAG       IMAGE ID       CREATED        SIZE
+#   openjdk                 21        079114de2be1   9 months ago   504MB
+
+# docker build -t auth-service-image:21 .
+# docker images
+#   REPOSITORY              TAG       IMAGE ID       CREATED         SIZE
+#   auth-service-image      21        6ee144586f82   3 seconds ago   529MB
+#   openjdk                 21        079114de2be1   9 months ago    504MB
+
+# docker run -itd --rm --name auth-service-app-21 -p 8080:8088 auth-service-image:21
+# docker ps -a
+#   CONTAINER ID   IMAGE                   COMMAND               CREATED          STATUS          PORTS                              NAMES
+#   c7e6fb496430   auth-service-image:21   "java -jar app.jar"   13 seconds ago   Up 12 seconds   8080/tcp, 0.0.0.0:8080->8088/tcp   auth-service-app-21
+
+# curl -s http://localhost:8080/transfer
+# curl -s http://localhost:8080/confirmOperation
+
+######## DOCKER-COMPOSE DEPLOY & START ########
+# docker-compose up --detach
+# curl -s localhost:8080/actuator/health
+#   {"status":"UP"}
+# curl -s http://localhost:8080/transfer
+# curl -s http://localhost:8080/confirmOperation
+
+version: "3"
+services:
+  money-transfer-service-container:
+    image: 'money-transfer-service-image:21'
+    build: ./
+    ports:
+      - '5500:5500'

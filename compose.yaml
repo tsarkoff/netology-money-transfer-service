@@ -1,1 +1,7 @@
+version: "3"
 services:
+  money-transfer-service-container:
+    image: 'money-transfer-service-image:21'
+    build: ./
+    ports:
+      - '5500:5500'
