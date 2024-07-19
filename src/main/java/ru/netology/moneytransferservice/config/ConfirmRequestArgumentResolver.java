@@ -12,6 +12,7 @@ import ru.netology.moneytransferservice.repository.ConfirmRequestDto;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 public class ConfirmRequestArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -26,15 +27,15 @@ public class ConfirmRequestArgumentResolver implements HandlerMethodArgumentReso
         return buildTConfirmRequestDto(requestBody);
     }
 
-    private ConfirmRequestDto buildTConfirmRequestDto(String requestBody) throws IOException {
-        String operationId = "";
+    private ConfirmRequestDto buildTConfirmRequestDto(String requestBody) {
+        JsonElement operationId = null;
         String code = "";
         JsonElement je = JsonParser.parseString(requestBody);
         for (Map.Entry<String, JsonElement> entry : je.getAsJsonObject().entrySet()) {
             if (entry.getValue().isJsonPrimitive()) {
                 switch (entry.getKey()) {
                     case "operationId":
-                        operationId = String.valueOf(entry.getValue());
+                        operationId = entry.getValue();
                         break;
                     case "code":
                         code = String.valueOf(entry.getValue());
@@ -42,6 +43,6 @@ public class ConfirmRequestArgumentResolver implements HandlerMethodArgumentReso
                 }
             }
         }
-        return new ConfirmRequestDto(operationId, code);
+        return new ConfirmRequestDto(Objects.requireNonNull(operationId).getAsInt(), code);
     }
 }

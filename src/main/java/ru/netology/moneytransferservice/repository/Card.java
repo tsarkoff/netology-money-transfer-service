@@ -35,4 +35,9 @@ public class Card {
         String cvv = ((Card) obj).CVV.replace("\"", "");
         return number.equals(num) && validTill.equals(valid) && CVV.equals(cvv);
     }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

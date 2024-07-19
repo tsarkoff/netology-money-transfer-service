@@ -6,6 +6,6 @@ import jakarta.validation.constraints.NotNull;
 public record OperationDto(
         @NotNull
         @NotBlank
-        String operationId
+        int operationId
 ) {
 }

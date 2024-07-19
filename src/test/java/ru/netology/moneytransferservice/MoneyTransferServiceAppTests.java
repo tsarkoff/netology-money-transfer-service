@@ -25,7 +25,7 @@ import static java.lang.String.format;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Testcontainers
 class MoneyTransferServiceAppTests {
-    private static final Set<String> opIds = ConcurrentHashMap.newKeySet();
+    private static final Set<Integer> opIds = ConcurrentHashMap.newKeySet();
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -54,8 +54,8 @@ class MoneyTransferServiceAppTests {
             "5555000055550000,      05/25,      555,    2222000022220000,   5000000,    RUR,        200 OK",
     }, ignoreLeadingAndTrailingWhitespace = true)
     public void testTransfer(String cardFormNumber, String cardFromValidTill, String cardFromCVV, String cardToNumber, int amountValue, String amountCurrency, String expected) {
-        /*Why gson.toJson(request) response doesn't work if response is the same JSON just w/o LFRC =>
-            String jsonRequest = buildRequestBody(cardFormNumber, cardFromValidTill, cardFromCVV, cardToNumber, amountValue, amountCurrency);*/
+    // Why gson.toJson(request) response doesn't work if response is the same JSON just w/o LFRC =>
+    // String jsonRequest = buildRequestBody(cardFormNumber, cardFromValidTill, cardFromCVV, cardToNumber, amountValue, amountCurrency);
         String jsonRequest = format("""
                         {
                           "cardFromNumber": "%s",
@@ -78,8 +78,8 @@ class MoneyTransferServiceAppTests {
             String body = response.getBody();
             Gson gson = new Gson();
             JsonElement jsonElement = gson.fromJson(body, JsonElement.class);
-            String operationId = jsonElement.getAsJsonObject().get("operationId").getAsString();
-            opIds.add(String.valueOf(operationId));
+            int operationId = jsonElement.getAsJsonObject().get("operationId").getAsInt();
+            opIds.add(operationId);
         }
 
         System.out.println(response);
@@ -91,7 +91,7 @@ class MoneyTransferServiceAppTests {
     @Order(3)
     public void testConfirm() {
         Gson gson = new Gson();
-        for (String opId : opIds) {
+        for (Integer opId : opIds) {
             ConfirmRequestDto confirmRequestDto = new ConfirmRequestDto(opId, "0000");
             String request = gson.toJson(confirmRequestDto);
             ResponseEntity<String> response = restTemplate.postForEntity(
@@ -100,12 +100,13 @@ class MoneyTransferServiceAppTests {
                     String.class);
             String body = response.getBody();
             JsonElement jsonElement = gson.fromJson(body, JsonElement.class);
-            String operationId = jsonElement.getAsJsonObject().get("operationId").getAsString();
+            int operationId = jsonElement.getAsJsonObject().get("operationId").getAsInt();
             System.out.println(response);
             Assertions.assertEquals(opId, operationId);
         }
     }
 
+    // Why gson.toJson(request) response doesn't work if response is the same JSON just w/o LFRC =>
     private String buildRequestBody(String cardFormNumber, String cardFromValidTill, String cardFromCVV, String cardToNumber, int amountValue, String amountCurrency) {
         Object request = new FlatTransferRequestDto(
                 cardFormNumber,

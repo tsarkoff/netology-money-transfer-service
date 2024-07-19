@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CardRepositoryImpl implements CardRepository {
-    private static final Set<String> opIds = ConcurrentHashMap.newKeySet();
+    private static final Set<Integer> opIds = ConcurrentHashMap.newKeySet();
     private static final List<Card> cards = List.of(
             new Card("2222000022220000", "02/25", "222"),
             new Card("3333000033330000", "03/25", "333"),
@@ -29,11 +29,11 @@ public class CardRepositoryImpl implements CardRepository {
         return null;
     }
 
-    public boolean saveOperationId(String operationId) {
+    public synchronized boolean saveOperationId(int operationId) {
         return opIds.add(operationId);
     }
 
-    public synchronized boolean confirmOperationId(String operationId) {
+    public synchronized boolean confirmOperationId(int operationId) {
         return opIds.remove(operationId);
     }
 }
